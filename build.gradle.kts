@@ -20,6 +20,12 @@ dependencies {
 
     // HTTP client for unit tests
     testCompile("org.apache.httpcomponents:fluent-hc:4.5.3")
+
+    // One-Nio
+    testCompile("ru.odnoklassniki:one-nio:1.0.2")
+
+    // Embedded storage
+    testCompile( "org.dizitart:nitrite:3.1.0")
 }
 
 tasks {
