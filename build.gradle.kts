@@ -15,7 +15,7 @@ dependencies {
     compile("com.intellij:annotations:12.0")
 
     // JUnit Jupiter test framework
-    compile("org.junit.jupiter:junit-jupiter-api:5.3.1")
+    testCompile("org.junit.jupiter:junit-jupiter-api:5.3.1")
 
 
     // HTTP client for unit tests

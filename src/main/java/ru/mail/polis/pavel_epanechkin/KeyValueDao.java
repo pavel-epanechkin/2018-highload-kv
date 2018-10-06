@@ -1,4 +1,4 @@
-package pavel_epanechkin;
+package ru.mail.polis.pavel_epanechkin;
 
 import org.dizitart.no2.objects.Cursor;
 import org.dizitart.no2.Nitrite;

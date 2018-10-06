@@ -1,9 +1,8 @@
-package pavel_epanechkin;
+package ru.mail.polis.pavel_epanechkin;
 
 import org.dizitart.no2.IndexType;
 import org.dizitart.no2.objects.Index;
 import org.dizitart.no2.objects.Indices;
-import pavel_epanechkin.Utils;
 
 @Indices({
         @Index(value = "keyHash", type = IndexType.Unique)

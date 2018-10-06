@@ -1,4 +1,4 @@
-package pavel_epanechkin;
+package ru.mail.polis.pavel_epanechkin;
 
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;

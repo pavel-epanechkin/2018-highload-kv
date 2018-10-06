@@ -1,4 +1,4 @@
-package pavel_epanechkin;
+package ru.mail.polis.pavel_epanechkin;
 
 import one.nio.http.HttpServerConfig;
 import one.nio.server.AcceptorConfig;

@@ -17,7 +17,7 @@
 package ru.mail.polis;
 
 import org.jetbrains.annotations.NotNull;
-import pavel_epanechkin.KeyValueDao;
+import ru.mail.polis.pavel_epanechkin.KeyValueDao;
 
 import java.io.File;
 import java.io.IOException;
