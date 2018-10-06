@@ -15,17 +15,17 @@ dependencies {
     compile("com.intellij:annotations:12.0")
 
     // JUnit Jupiter test framework
-    testCompile("org.junit.jupiter:junit-jupiter-api:5.3.1")
+    compile("org.junit.jupiter:junit-jupiter-api:5.3.1")
 
 
     // HTTP client for unit tests
-    testCompile("org.apache.httpcomponents:fluent-hc:4.5.3")
+    compile("org.apache.httpcomponents:fluent-hc:4.5.3")
 
     // One-Nio
-    testCompile("ru.odnoklassniki:one-nio:1.0.2")
+    compile("ru.odnoklassniki:one-nio:1.0.2")
 
     // Embedded storage
-    testCompile( "org.dizitart:nitrite:3.1.0")
+    compile( "org.dizitart:nitrite:3.1.0")
 }
 
 tasks {
