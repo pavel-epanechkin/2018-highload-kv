@@ -36,6 +36,7 @@ dependencies {
 tasks {
     "test"(Test::class) {
         maxHeapSize = "128m"
+        useJUnitPlatform()
     }
 }
 
