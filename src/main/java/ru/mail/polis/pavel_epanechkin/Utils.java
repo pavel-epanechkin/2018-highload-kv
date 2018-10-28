@@ -21,4 +21,15 @@ public class Utils {
 
         return result;
     }
+
+    public static int getSimpleStringsDistance(String a, String b) {
+        int minStringSize = Math.min(a.length(), b.length());
+        int maxStringSize = Math.max(a.length(), b.length());
+        int distance = maxStringSize - minStringSize;
+
+        for (int i = 0; i < minStringSize; i++) {
+            distance += a.charAt(i) == b.charAt(i) ? 0 : 1;
+        }
+        return distance;
+    }
 }

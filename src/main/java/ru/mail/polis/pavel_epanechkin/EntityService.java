@@ -5,11 +5,14 @@ import ru.mail.polis.KVDao;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class EntityService {
 
     private KVDao dao;
+
+    public static final String ENTITY_TIMESTAMP_HEADER = "X-Timestamp: ";
+    public static final String ENTITY_REMOVED_HEADER = "X-Removed: ";
 
     public EntityService(KVDao dao) {
         this.dao = dao;
@@ -19,8 +22,13 @@ public class EntityService {
         Response response;
 
         try {
-            byte[] value = dao.get(id.getBytes(Charset.defaultCharset()));
-            response = Response.ok(value);
+            StorageObject object = ((ExtendedKeyValueDao) dao).getRecord(id.getBytes(Charset.defaultCharset()));
+
+            response = Response.ok(object.getValue());
+            response.addHeader(ENTITY_TIMESTAMP_HEADER + object.getTimestamp().getTime());
+
+            if (object.getRemoved())
+                response.addHeader(ENTITY_REMOVED_HEADER + true);
         }
         catch (NoSuchElementException e) {
             response = new Response(Response.NOT_FOUND, Response.EMPTY);
@@ -50,7 +58,7 @@ public class EntityService {
         Response response;
 
         try {
-            dao.remove(id.getBytes(Charset.defaultCharset()));
+            ((ExtendedKeyValueDao) dao).setRemoved(id.getBytes(Charset.defaultCharset()));
             response = new Response(Response.ACCEPTED, Response.EMPTY);
         }
         catch (IOException e) {
@@ -59,4 +67,6 @@ public class EntityService {
 
         return response;
     }
+
+
 }
