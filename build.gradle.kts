@@ -11,6 +11,9 @@ repositories {
 }
 
 dependencies {
+    // Our beloved one-nio
+    compile("ru.odnoklassniki:one-nio:1.0.2")
+
     // Annotations for better code documentation
     compile("com.intellij:annotations:12.0")
 
@@ -26,6 +29,8 @@ dependencies {
 
     // Embedded storage
     compile( "org.dizitart:nitrite:3.1.0")
+    // Guava for tests
+    testCompile("com.google.guava:guava:23.1-jre")
 }
 
 tasks {
