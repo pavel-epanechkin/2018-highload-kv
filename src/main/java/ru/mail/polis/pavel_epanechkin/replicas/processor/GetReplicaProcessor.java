@@ -1,27 +1,30 @@
-package ru.mail.polis.pavel_epanechkin;
+package ru.mail.polis.pavel_epanechkin.replicas.processor;
 
 import one.nio.http.Request;
 import one.nio.http.Response;
+import ru.mail.polis.pavel_epanechkin.ClusterNode;
+import ru.mail.polis.pavel_epanechkin.ClusteredEntityService;
+import ru.mail.polis.pavel_epanechkin.EntityService;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 
 public class GetReplicaProcessor extends ReplicaProcessor {
 
-    private int ackCount = 0;
-    private boolean removedFlag = false;
+    private boolean removed = false;
+
     private byte[] resultObject = null;
+
     private long mostFreshTimestamp = 0;
 
-    public GetReplicaProcessor(ClusteredEntityService clusteredEntityService, EntityService entityService, int currentNodePort) {
-        super(clusteredEntityService, entityService, currentNodePort);
+    public GetReplicaProcessor(ClusteredEntityService clusteredEntityService, EntityService entityService, Executor executor, int currentNodePort) {
+        super(clusteredEntityService, entityService, executor, currentNodePort);
     }
 
     @Override
-    protected Future<Response> createReplicaRequest(String entityId, byte[] value, ClusterNode targetNode) {
-        if (targetNode.getPort() == currentNodePort)
-            return entityService.getEntity(entityId);
-        else
-            return clusteredEntityService.sendReplicationRequest(targetNode, Request.METHOD_GET, entityId, value);
+    protected Response createLocalEntityRequest(String entityId, byte[] value) {
+        return entityService.getEntity(entityId);
     }
 
     @Override
@@ -34,7 +37,7 @@ public class GetReplicaProcessor extends ReplicaProcessor {
                     Long objectTimestamp = new Long(timestamp);
 
                     if (response.getHeader(EntityService.ENTITY_REMOVED_HEADER) != null)
-                        removedFlag = true;
+                        removed = true;
                     else if (objectTimestamp > mostFreshTimestamp) {
                         mostFreshTimestamp = objectTimestamp;
                         resultObject = response.getBody();
@@ -44,27 +47,13 @@ public class GetReplicaProcessor extends ReplicaProcessor {
         }
     }
 
-    public int getAckCount() {
-        return ackCount;
+    public boolean isRemoved() {
+        return removed;
     }
 
-    public void setAckCount(int ackCount) {
-        this.ackCount = ackCount;
-    }
-
-    public boolean isRemovedFlag() {
-        return removedFlag;
-    }
-
-    public void setRemovedFlag(boolean removedFlag) {
-        this.removedFlag = removedFlag;
-    }
 
     public byte[] getResultObject() {
         return resultObject;
     }
 
-    public void setResultObject(byte[] resultObject) {
-        this.resultObject = resultObject;
-    }
 }

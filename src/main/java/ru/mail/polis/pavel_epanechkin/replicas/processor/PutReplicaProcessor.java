@@ -1,24 +1,24 @@
-package ru.mail.polis.pavel_epanechkin;
+package ru.mail.polis.pavel_epanechkin.replicas.processor;
 
 import one.nio.http.Request;
 import one.nio.http.Response;
+import ru.mail.polis.pavel_epanechkin.ClusterNode;
+import ru.mail.polis.pavel_epanechkin.ClusteredEntityService;
+import ru.mail.polis.pavel_epanechkin.EntityService;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 
 public class PutReplicaProcessor extends ReplicaProcessor {
 
-    private boolean removedFlag = false;
-
-    public PutReplicaProcessor(ClusteredEntityService clusteredEntityService, EntityService entityService, int currentNodePort) {
-        super(clusteredEntityService, entityService, currentNodePort);
+    public PutReplicaProcessor(ClusteredEntityService clusteredEntityService, EntityService entityService, Executor executor, int currentNodePort) {
+        super(clusteredEntityService, entityService, executor, currentNodePort);
     }
 
     @Override
-    protected Future<Response> createReplicaRequest(String entityId, byte[] value, ClusterNode targetNode) {
-        if (targetNode.getPort() == currentNodePort)
-            return entityService.saveEntity(entityId, value);
-        else
-            return clusteredEntityService.sendReplicationRequest(targetNode, Request.METHOD_PUT, entityId, value);
+    protected Response createLocalEntityRequest(String entityId, byte[] value) {
+        return entityService.saveEntity(entityId, value);
     }
 
     @Override
