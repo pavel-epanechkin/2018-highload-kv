@@ -1,10 +1,10 @@
 package ru.mail.polis.pavel_epanechkin;
 
-public class Replicas {
+public class ReplicationOptions {
     private int ack;
     private int from;
 
-    public Replicas(int ack, int from) {
+    public ReplicationOptions(int ack, int from) {
         this.ack = ack;
         this.from = from;
     }

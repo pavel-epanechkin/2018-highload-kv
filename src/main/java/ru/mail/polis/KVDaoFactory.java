@@ -17,7 +17,7 @@
 package ru.mail.polis;
 
 import org.jetbrains.annotations.NotNull;
-import ru.mail.polis.pavel_epanechkin.ExtendedKeyValueDao;
+import ru.mail.polis.pavel_epanechkin.ExtendedKVDaoImpl;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Vadim Tsesko <incubos@yandex.com>
  */
 final class KVDaoFactory {
-    private static final long MAX_HEAP = 128 * 1024 * 1024;
+    private static final long MAX_HEAP = 512 * 1024 * 1024;
 
     private KVDaoFactory() {
         // Not instantiatable
@@ -54,6 +54,6 @@ final class KVDaoFactory {
             throw new IllegalArgumentException("Path is not a directory: " + data);
         }
 
-        return new ExtendedKeyValueDao(data);
+        return new ExtendedKVDaoImpl(data);
     }
 }

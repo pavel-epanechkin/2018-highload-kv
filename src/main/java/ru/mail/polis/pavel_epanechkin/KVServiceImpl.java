@@ -8,16 +8,17 @@ import ru.mail.polis.KVService;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
-public class KeyValueService extends HttpServer implements KVService {
+public class KVServiceImpl extends HttpServer implements KVService {
 
-    private ReplicationService replicationService;
+    private ClusteredEntityService clusteredEntityService;
 
     private KVDao dao;
 
-    public KeyValueService(final int port, @NotNull final KVDao dao, Set<String> topology) throws IOException {
+    public KVServiceImpl(final int port, @NotNull final KVDao dao, Set<String> topology) throws IOException {
         super(HttpServerConfigFactory.create(port));
-        replicationService = new ReplicationService(dao, topology, port);
+        clusteredEntityService = new ClusteredEntityService(dao, topology, port);
         this.dao = dao;
     }
 
@@ -27,23 +28,23 @@ public class KeyValueService extends HttpServer implements KVService {
     }
 
     @Path("/v0/entity")
-    public Response handleEntityRequest(Request request, @Param("id") String id, @Param("replicas") String replicas) throws IOException {
+    public Response handleEntityRequest(Request request, @Param("id") String id, @Param("replicas") String replicas) throws IOException, ExecutionException, InterruptedException {
         if (id == null || id.isEmpty())
             return new Response(Response.BAD_REQUEST, Response.EMPTY);
 
         if (replicas != null && replicas.isEmpty())
             return new Response(Response.BAD_REQUEST, Response.EMPTY);
 
-        String replicationHeader = request.getHeader(ReplicationService.REPLICATION_HEADER);
+        String replicationHeader = request.getHeader(ClusteredEntityService.REPLICATION_HEADER);
         boolean isReplication = replicationHeader != null;
 
         switch (request.getMethod()) {
             case Request.METHOD_GET:
-                return replicationService.getEntity(id, replicas, isReplication);
+                return clusteredEntityService.getEntity(id, replicas, isReplication);
             case Request.METHOD_PUT:
-                return replicationService.saveEntity(id, request.getBody(), replicas, isReplication);
+                return clusteredEntityService.saveEntity(id, request.getBody(), replicas, isReplication);
             case Request.METHOD_DELETE:
-                return replicationService.removeEntity(id, replicas, isReplication);
+                return clusteredEntityService.removeEntity(id, replicas, isReplication);
             default:
                 return new Response(Response.METHOD_NOT_ALLOWED, Response.EMPTY);
         }

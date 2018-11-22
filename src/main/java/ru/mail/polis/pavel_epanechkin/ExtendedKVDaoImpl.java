@@ -9,9 +9,9 @@ import java.util.NoSuchElementException;
 
 import static org.dizitart.no2.objects.filters.ObjectFilters.eq;
 
-public class ExtendedKeyValueDao extends KeyValueDao {
+public class ExtendedKVDaoImpl extends KVDaoImpl {
 
-    public ExtendedKeyValueDao(@NotNull File storagePath) {
+    public ExtendedKVDaoImpl(@NotNull File storagePath) {
         super(storagePath);
     }
 

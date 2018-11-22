@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 
 import static org.dizitart.no2.objects.filters.ObjectFilters.eq;
 
-public class KeyValueDao implements KVDao {
+public class KVDaoImpl implements KVDao {
 
     private Nitrite storage;
 
@@ -50,8 +50,10 @@ public class KeyValueDao implements KVDao {
         storage.close();
     }
 
-    public KeyValueDao(@NotNull File storagePath) {
-        storage = Nitrite.builder().filePath(storagePath.getPath() + File.separator + "storage.db").openOrCreate();
+    public KVDaoImpl(@NotNull File storagePath) {
+        storage = Nitrite.builder()
+                .filePath(storagePath.getPath() + File.separator + "storage.db")
+                .openOrCreate();
         objectRepository = storage.getRepository(StorageObject.class);
     }
 }

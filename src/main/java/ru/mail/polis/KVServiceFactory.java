@@ -17,7 +17,7 @@
 package ru.mail.polis;
 
 import org.jetbrains.annotations.NotNull;
-import ru.mail.polis.pavel_epanechkin.KeyValueService;
+import ru.mail.polis.pavel_epanechkin.KVServiceImpl;
 
 import java.io.IOException;
 import java.util.Set;
@@ -28,7 +28,7 @@ import java.util.Set;
  * @author Vadim Tsesko <mail@incubos.org>
  */
 final class KVServiceFactory {
-    private static final long MAX_HEAP = 128 * 1024 * 1024;
+    private static final long MAX_HEAP = 512 * 1024 * 1024;
 
     private KVServiceFactory() {
         // Not supposed to be instantiated
@@ -55,6 +55,6 @@ final class KVServiceFactory {
             throw new IllegalArgumentException("Port out of range");
         }
 
-        return new KeyValueService(port, dao, topology);
+        return new KVServiceImpl(port, dao, topology);
     }
 }
