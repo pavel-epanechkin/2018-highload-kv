@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Vadim Tsesko <incubos@yandex.com>
  */
 final class KVDaoFactory {
-    private static final long MAX_HEAP = 512 * 1024 * 1024;
+    private static final long MAX_HEAP = 128 * 1024 * 1024;
 
     private KVDaoFactory() {
         // Not instantiatable

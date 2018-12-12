@@ -28,7 +28,7 @@ import java.util.Set;
  * @author Vadim Tsesko <mail@incubos.org>
  */
 final class KVServiceFactory {
-    private static final long MAX_HEAP = 512 * 1024 * 1024;
+    private static final long MAX_HEAP = 128 * 1024 * 1024;
 
     private KVServiceFactory() {
         // Not supposed to be instantiated
