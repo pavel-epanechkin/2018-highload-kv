@@ -1,4 +1,4 @@
-package ru.mail.polis.pavel_epanechkin;
+package ru.mail.polis.pavel.epanechkin;
 
 
 import one.nio.http.*;

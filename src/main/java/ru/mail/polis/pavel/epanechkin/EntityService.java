@@ -1,4 +1,4 @@
-package ru.mail.polis.pavel_epanechkin;
+package ru.mail.polis.pavel.epanechkin;
 
 import one.nio.http.Response;
 import ru.mail.polis.KVDao;
@@ -6,30 +6,26 @@ import ru.mail.polis.KVDao;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 public class EntityService {
 
-    private KVDao dao;
-
+    private ExtendedKVDaoImpl dao;
 
     public static final String ENTITY_TIMESTAMP_HEADER = "X-Timestamp: ";
     public static final String ENTITY_REMOVED_HEADER = "X-Removed: ";
 
     public EntityService(KVDao dao) {
-        this.dao = dao;
+        this.dao = ((ExtendedKVDaoImpl) dao);
     }
 
     public Response getEntity(String id) {
         Response response;
 
         try {
-            StorageObject object = ((ExtendedKVDaoImpl) dao).getRecord(id.getBytes(Charset.defaultCharset()));
+            StorageObject object = dao.getRecord(id.getBytes(Charset.defaultCharset()));
 
             response = Response.ok(object.getValue());
-            response.addHeader(ENTITY_TIMESTAMP_HEADER + object.getTimestamp().getTime());
+            response.addHeader(ENTITY_TIMESTAMP_HEADER + object.getTimestamp());
 
             if (object.getRemoved())
                 response.addHeader(ENTITY_REMOVED_HEADER + true);
@@ -61,7 +57,7 @@ public class EntityService {
         Response response;
 
         try {
-            ((ExtendedKVDaoImpl) dao).setRemoved(id.getBytes(Charset.defaultCharset()));
+            dao.setRemoved(id.getBytes(Charset.defaultCharset()));
             response = new Response(Response.ACCEPTED, Response.EMPTY);
         } catch (IOException e) {
             response = new Response(Response.INTERNAL_ERROR, Response.EMPTY);

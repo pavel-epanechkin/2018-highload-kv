@@ -1,19 +1,18 @@
-package ru.mail.polis.pavel_epanechkin.replicas.processor;
+package ru.mail.polis.pavel.epanechkin.replicas.processor;
 
-import one.nio.http.Request;
 import one.nio.http.Response;
+import ru.mail.polis.pavel.epanechkin.*;
 import ru.mail.polis.pavel_epanechkin.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class ReplicaProcessor {
 
-    protected int ackCount = 0;
+    protected AtomicInteger ackCount = new AtomicInteger(0);
 
     protected ClusteredEntityService clusteredEntityService;
 
@@ -21,7 +20,7 @@ public abstract class ReplicaProcessor {
 
     protected int currentNodePort;
 
-    protected ExecutorCompletionService<Response> executorCompletionService;
+    protected ExecutorCompletionService<Void> executorCompletionService;
 
     protected abstract Response createLocalEntityRequest(String entityId, byte[] value);
 
@@ -36,29 +35,37 @@ public abstract class ReplicaProcessor {
 
     public void getAndHandleReplicas(int method, String entityId, byte[] value,
                                      ReplicationOptions replicationOptions) throws ExecutionException, InterruptedException {
-        String keyHash = Utils.getMD5(entityId.getBytes());
+        String keyHash = Utils.getSHA256(entityId.getBytes());
         List<ClusterNode> sortedNodes = clusteredEntityService.getNodesSortedByDistances(keyHash);
 
-        for (int i = 0; i < replicationOptions.getFrom(); i++) {
-            createReplicaRequest(method, entityId, value, sortedNodes.get(i));
-        }
+        for (int i = 1; i < replicationOptions.getFrom(); i++) {
+            ClusterNode node = sortedNodes.get(i);
+            executorCompletionService.submit(() -> {
+                createReplicaRequestAndHandleResult(method, entityId, value, node);
+            }, null);
 
-        for (int i = 0; i < replicationOptions.getFrom(); i++) {
-            handleResponse(executorCompletionService.take().get());
+        }
+        createReplicaRequestAndHandleResult(method, entityId, value, sortedNodes.get(0));
+
+        for (int i = 1; i < replicationOptions.getFrom(); i++) {
+            executorCompletionService.take();
         }
 
     }
 
-    private Future<Response> createReplicaRequest(int method, String entityId, byte[] value, ClusterNode targetNode) {
-        return executorCompletionService.submit(() -> {
-            if (targetNode.getPort() == currentNodePort)
-                return createLocalEntityRequest(entityId, value);
-            else
-                return clusteredEntityService.sendReplicationRequest(targetNode, method, entityId, value);
-        });
+    private void createReplicaRequestAndHandleResult(int method, String entityId, byte[] value, ClusterNode targetNode) {
+        Response response;
+
+        if (targetNode.getPort() == currentNodePort)
+            response = createLocalEntityRequest(entityId, value);
+        else
+            response = clusteredEntityService.sendReplicationRequest(targetNode, method, entityId, value);
+
+        handleResponse(response);
     }
+
 
     public int getAckCount() {
-        return ackCount;
+        return ackCount.get();
     }
 }

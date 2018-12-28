@@ -1,4 +1,4 @@
-package ru.mail.polis.pavel_epanechkin;
+package ru.mail.polis.pavel.epanechkin;
 
 import one.nio.http.HttpClient;
 import one.nio.net.ConnectionString;
@@ -12,7 +12,7 @@ public class ClusterNode {
     public ClusterNode(String address) {
         this.address = address;
         this.port = getPortFromName(address);
-        this.id = Utils.getMD5(address.getBytes());
+        this.id = Utils.getSHA256(address.getBytes());
         httpClient = new HttpClient(new ConnectionString(address));
     }
 

@@ -1,4 +1,4 @@
-package ru.mail.polis.pavel_epanechkin;
+package ru.mail.polis.pavel.epanechkin;
 
 import org.dizitart.no2.objects.Cursor;
 import org.jetbrains.annotations.NotNull;
@@ -17,23 +17,31 @@ public class ExtendedKVDaoImpl extends KVDaoImpl {
 
     @NotNull
     public StorageObject getRecord(@NotNull byte[] key) throws NoSuchElementException, IOException {
-        String keyHash = Utils.getMD5(key);
-        Cursor<StorageObject> cursor = objectRepository.find(eq("keyHash", keyHash));
+        String keyHash = Utils.getSHA256(key);
+        StorageObject object = cache.getIfPresent(keyHash);
 
-        if (cursor.size() == 0)
-            throw new NoSuchElementException();
+        if (object == null) {
+            Cursor<StorageObject> cursor = objectRepository.find(eq("keyHash", keyHash));
 
-        return cursor.firstOrDefault();
+            if (cursor.size() == 0)
+                throw new NoSuchElementException();
+
+            object = cursor.firstOrDefault();
+            cache.put(keyHash, object);
+        }
+
+        return object;
     }
 
     public void setRemoved(@NotNull byte[] key) throws IOException {
-        String keyHash = Utils.getMD5(key);
+        String keyHash = Utils.getSHA256(key);
         Cursor<StorageObject> cursor = objectRepository.find(eq("keyHash", keyHash));
 
         if (cursor.size() > 0) {
             StorageObject storageObject = cursor.firstOrDefault();
             storageObject.setRemoved(true);
             objectRepository.update(eq("keyHash", keyHash), storageObject, false);
+            cache.invalidate(keyHash);
         }
     }
 }

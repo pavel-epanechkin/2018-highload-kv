@@ -1,18 +1,20 @@
-package ru.mail.polis.pavel_epanechkin;
+package ru.mail.polis.pavel.epanechkin;
 
 import one.nio.http.Request;
 import one.nio.http.Response;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.KVDao;
-import ru.mail.polis.pavel_epanechkin.replicas.processor.DeleteReplicaProcessor;
-import ru.mail.polis.pavel_epanechkin.replicas.processor.GetReplicaProcessor;
-import ru.mail.polis.pavel_epanechkin.replicas.processor.PutReplicaProcessor;
+import ru.mail.polis.pavel.epanechkin.replicas.processor.PutReplicaProcessor;
+import ru.mail.polis.pavel.epanechkin.replicas.processor.DeleteReplicaProcessor;
+import ru.mail.polis.pavel.epanechkin.replicas.processor.GetReplicaProcessor;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class ClusteredEntityService {
@@ -27,10 +29,10 @@ public class ClusteredEntityService {
 
     public static final String REPLICATION_HEADER = "X-Replication";
 
-    private Executor executor;
+    private ExecutorService executor;
 
     public ClusteredEntityService(KVDao dao, Set<String> topology, int port) {
-        executor = Executors.newFixedThreadPool(topology.size());
+        executor = Executors.newWorkStealingPool();
         entityService = new EntityService(dao);
         this.topology = topology;
         this.currentPort = port;
@@ -117,7 +119,6 @@ public class ClusteredEntityService {
         }
 
         try {
-            clusterNode.getHttpClient().setConnectTimeout(100);
             Response response = clusterNode.getHttpClient().invoke(request);
             return response;
         }
@@ -153,10 +154,8 @@ public class ClusteredEntityService {
 
     private ReplicationOptions getDefaultReplicationOptions() {
         int from = topology.size();
-        int rem = from % 2;
-        long ack = rem == 0 ? from / 2 + 1 : Math.round(((double) from) / ((double) 2));
-
-        return new ReplicationOptions(((int) ack), from);
+        int ack = from / 2 + 1;
+        return new ReplicationOptions(ack, from);
     }
 
     public List<ClusterNode> getNodesSortedByDistances(String hash) {

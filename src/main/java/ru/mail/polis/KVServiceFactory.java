@@ -17,7 +17,7 @@
 package ru.mail.polis;
 
 import org.jetbrains.annotations.NotNull;
-import ru.mail.polis.pavel_epanechkin.KVServiceImpl;
+import ru.mail.polis.pavel.epanechkin.KVServiceImpl;
 
 import java.io.IOException;
 import java.util.Set;

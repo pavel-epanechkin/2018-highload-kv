@@ -1,14 +1,10 @@
-package ru.mail.polis.pavel_epanechkin.replicas.processor;
+package ru.mail.polis.pavel.epanechkin.replicas.processor;
 
-import one.nio.http.Request;
 import one.nio.http.Response;
-import ru.mail.polis.pavel_epanechkin.ClusterNode;
-import ru.mail.polis.pavel_epanechkin.ClusteredEntityService;
-import ru.mail.polis.pavel_epanechkin.EntityService;
+import ru.mail.polis.pavel.epanechkin.ClusteredEntityService;
+import ru.mail.polis.pavel.epanechkin.EntityService;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
 
 public class PutReplicaProcessor extends ReplicaProcessor {
 
@@ -24,7 +20,7 @@ public class PutReplicaProcessor extends ReplicaProcessor {
     @Override
     protected void handleResponse(Response response) {
         if (response != null && response.getStatus() == 201) {
-            ackCount++;
+            ackCount.incrementAndGet();
         }
     }
 

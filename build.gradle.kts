@@ -30,8 +30,8 @@ dependencies {
 
     // Embedded storage
     compile( "org.dizitart:nitrite:3.1.0")
-    // Guava for tests
-    testCompile("com.google.guava:guava:23.1-jre")
+    // Guava for tests and for cache
+    compile("com.google.guava:guava:23.1-jre")
 }
 
 tasks {

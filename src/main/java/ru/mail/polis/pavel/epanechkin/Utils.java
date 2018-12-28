@@ -1,4 +1,4 @@
-package ru.mail.polis.pavel_epanechkin;
+package ru.mail.polis.pavel.epanechkin;
 
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
@@ -6,11 +6,12 @@ import java.security.NoSuchAlgorithmException;
 
 public class Utils {
 
-    public static String getMD5(byte[] data) {
+
+    public static String getSHA256(byte[] data) {
         String result = "";
 
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             messageDigest.update(data);
             byte[] digest = messageDigest.digest();
             result = DatatypeConverter.printBase64Binary(digest);

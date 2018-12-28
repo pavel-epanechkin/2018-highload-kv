@@ -1,11 +1,10 @@
-package ru.mail.polis.pavel_epanechkin;
+package ru.mail.polis.pavel.epanechkin;
 
 import org.dizitart.no2.IndexType;
 import org.dizitart.no2.objects.Index;
 import org.dizitart.no2.objects.Indices;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 
 @Indices({
         @Index(value = "keyHash", type = IndexType.Unique)
@@ -19,16 +18,16 @@ public class StorageObject implements Serializable {
 
     private byte[] value;
 
-    private Timestamp timestamp;
+    private long timestamp;
 
     private Boolean removed;
 
-    public StorageObject(byte[] key, byte[] value, Timestamp timestamp) {
+    public StorageObject(byte[] key, byte[] value, long timestamp) {
         this.key = key;
         this.value = value;
         this.removed = false;
         this.timestamp = timestamp;
-        this.keyHash = Utils.getMD5(key);
+        this.keyHash = Utils.getSHA256(key);
     }
 
     public StorageObject() {}
@@ -39,7 +38,11 @@ public class StorageObject implements Serializable {
 
     public void setKey(byte[] key) {
         this.key = key;
-        this.keyHash = Utils.getMD5(key);
+        this.keyHash = Utils.getSHA256(key);
+    }
+
+    public String getKeyHash() {
+        return keyHash;
     }
 
     public byte[] getValue() {
@@ -50,11 +53,11 @@ public class StorageObject implements Serializable {
         this.value = value;
     }
 
-    public Timestamp getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
