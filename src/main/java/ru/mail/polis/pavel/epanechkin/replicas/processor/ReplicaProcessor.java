@@ -2,7 +2,6 @@ package ru.mail.polis.pavel.epanechkin.replicas.processor;
 
 import one.nio.http.Response;
 import ru.mail.polis.pavel.epanechkin.*;
-import ru.mail.polis.pavel_epanechkin.*;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
