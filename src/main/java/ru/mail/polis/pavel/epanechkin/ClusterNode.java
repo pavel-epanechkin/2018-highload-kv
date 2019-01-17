@@ -18,7 +18,7 @@ public class ClusterNode {
 
     private int getPortFromName(String name) {
         String[] tmp = name.split(":");
-        return new Integer(tmp[2]);
+        return Integer.parseInt(tmp[2]);
     }
 
     public String getAddress() {

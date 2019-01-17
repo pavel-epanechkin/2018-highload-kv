@@ -5,14 +5,17 @@ import ru.mail.polis.pavel.epanechkin.ClusteredEntityService;
 import ru.mail.polis.pavel.epanechkin.EntityService;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongUnaryOperator;
 
 public class GetReplicaProcessor extends ReplicaProcessor {
 
-    private boolean removed = false;
+    private AtomicBoolean removed = new AtomicBoolean(false);
+
+    private AtomicLong mostFreshTimestamp = new AtomicLong(0);
 
     private byte[] resultObject = null;
-
-    private long mostFreshTimestamp = 0;
 
     public GetReplicaProcessor(ClusteredEntityService clusteredEntityService, EntityService entityService, Executor executor, int currentNodePort) {
         super(clusteredEntityService, entityService, executor, currentNodePort);
@@ -30,23 +33,24 @@ public class GetReplicaProcessor extends ReplicaProcessor {
                 ackCount.incrementAndGet();
                 if (response.getStatus() == 200) {
                     String timestamp = response.getHeader(EntityService.ENTITY_TIMESTAMP_HEADER);
-                    Long objectTimestamp = new Long(timestamp);
+                    long objectTimestamp = Long.parseLong(timestamp);
 
-                    synchronized (this) {
-                        if (response.getHeader(EntityService.ENTITY_REMOVED_HEADER) != null)
-                            removed = true;
-                        else if (objectTimestamp > mostFreshTimestamp) {
-                            mostFreshTimestamp = objectTimestamp;
+                    if (response.getHeader(EntityService.ENTITY_REMOVED_HEADER) != null)
+                        removed.set(true);
+                    else {
+                        long oldMostFreshTimestamp = mostFreshTimestamp
+                                .getAndUpdate(t -> t < objectTimestamp ? objectTimestamp : t);
+                        if (oldMostFreshTimestamp < objectTimestamp)
                             resultObject = response.getBody();
-                        }
                     }
+
                 }
             }
         }
     }
 
     public boolean isRemoved() {
-        return removed;
+        return removed.get();
     }
 
 

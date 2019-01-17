@@ -23,7 +23,7 @@ public class ClusteredEntityService {
 
     private Set<String> topology;
 
-    private ArrayList<ClusterNode> clusterNodes;
+    private List<ClusterNode> clusterNodes;
 
     private int currentPort;
 
@@ -139,8 +139,8 @@ public class ClusteredEntityService {
 
         try {
             String[] tmp = replicas.split("/");
-            int ack = new Integer(tmp[0]);
-            int from = new Integer(tmp[1]);
+            int ack = Integer.parseInt(tmp[0]);
+            int from = Integer.parseInt(tmp[1]);
 
             if (ack > 0 && ack <= from)
                 return new ReplicationOptions(ack, from);
