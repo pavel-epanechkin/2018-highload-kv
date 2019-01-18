@@ -7,6 +7,7 @@ import ru.mail.polis.pavel.epanechkin.EntityService;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.LongUnaryOperator;
 
 public class GetReplicaProcessor extends ReplicaProcessor {
@@ -15,7 +16,7 @@ public class GetReplicaProcessor extends ReplicaProcessor {
 
     private AtomicLong mostFreshTimestamp = new AtomicLong(0);
 
-    private byte[] resultObject = null;
+    private AtomicReference<byte[]> resultObject = new AtomicReference<>();
 
     public GetReplicaProcessor(ClusteredEntityService clusteredEntityService, EntityService entityService, Executor executor, int currentNodePort) {
         super(clusteredEntityService, entityService, executor, currentNodePort);
@@ -38,12 +39,9 @@ public class GetReplicaProcessor extends ReplicaProcessor {
                     if (response.getHeader(EntityService.ENTITY_REMOVED_HEADER) != null)
                         removed.set(true);
                     else {
-                        long oldMostFreshTimestamp = mostFreshTimestamp
-                                .getAndUpdate(t -> t < objectTimestamp ? objectTimestamp : t);
-                        if (oldMostFreshTimestamp < objectTimestamp)
-                            resultObject = response.getBody();
+                        mostFreshTimestamp.updateAndGet(t -> t < objectTimestamp ? objectTimestamp : t);
+                        resultObject.updateAndGet(obj -> mostFreshTimestamp.get() == objectTimestamp ? response.getBody() : obj);
                     }
-
                 }
             }
         }
@@ -55,7 +53,7 @@ public class GetReplicaProcessor extends ReplicaProcessor {
 
 
     public byte[] getResultObject() {
-        return resultObject;
+        return resultObject.get();
     }
 
 }
